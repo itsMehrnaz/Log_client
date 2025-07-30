@@ -1,40 +1,46 @@
-use tokio::net::TcpListener;
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::net::{TcpListener, TcpStream};
+use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Box<dyn std::error::Error>>{
     let listener = TcpListener::bind("127.0.0.1:8080").await?;
     println!("server is running on 127.0.0.1:8080");
 
     loop {
         let (mut socket, addr) = listener.accept().await?;
-        println!("new connection from {:?}", addr);
+        println!("connectnig to {}", addr);
 
-            tokio::spawn(async move{
-                let mut buf = [0u8; 1024];
+        tokio::spawn(async move {
 
-                loop {
-                    let n = match socket.read(&mut buf).await {
-                        Ok(0) => {
-                            println!("connection closed by {:?}", addr);
-                            return ;
-                        }
-                        Ok(n) => n,
-                        Err(e) => {
-                            eprintln!("Failed to read from socket; err = {:?}", e);
-                            return;
-                        }
-
-
-                    };
-
-                    println!("resived from {:?} : {}", addr, String::from_utf8_lossy(&buf[..n]));
-
-                    if let Err(e) = socket.write_all(&buf[..n]).await {
-                        eprintln!("failed to write on socket; err = {:?}", e);
-                        return;
-                    }
-                }
-            });
+            if let Err(e) = handle_client(socket).await {
+                eprintln!("Error: {}", e);
+            }
+        });
     }
+}
+
+async fn handle_client(mut socket: TcpStream) -> tokio::io::Result<()> {
+    socket.write_all(b"welcome to echo server :))))))))))))))))))))))))").await?;
+
+    let (reader, mut writer) = socket.split();
+    let mut buf_reader = BufReader::new(reader);
+    let mut line = String::new();
+
+    loop {
+        line.clear();
+        let bytes_read = buf_reader.read_line(&mut line).await?;
+        if bytes_read == 0 {
+            break;
+        }
+
+        let trimmed = line.trim();
+        if trimmed == "quit" {
+            writer.write_all(b"goodbye").await?;
+            break;
+        }
+
+        let response = format!("echo :{}\n", trimmed);
+        writer.write_all(response.as_bytes()).await?;
+    }
+    Ok(())
 }
