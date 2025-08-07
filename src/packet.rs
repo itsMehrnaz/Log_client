@@ -7,7 +7,7 @@ pub struct Note {
 }
 
 impl Note  {
-    fn new(title: &str, body: &str) -> Self{
+    pub fn new(title: &str, body: &str) -> Self{
         Self { title: title.to_string(),
                body: body.to_string() 
             }
