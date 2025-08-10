@@ -45,19 +45,15 @@ async fn main() -> std::io::Result<()> {
 
         loop {
             line.clear();
-            let bytes_read: usize = buf_reader.read_line(&mut line).await?;
-            if bytes_read == 0 {
-                break;
-            }
+            let mut len_buf = [0u8; 4];
+            socket.read_exact(&mut len_buf).await?;
+            let len = u32::from_be_bytes(len_buf);
 
-            let trimmed = line.trim();
-            if trimmed == "quit" {
-                writer.write_all(b"goodbye");
-                break;
-            }
+            let mut payload_buf = vec![0u8; len as usize];
+            socket.read_exact(&mut payload_buf).await?;
 
-            let response = format!("echo: {} \n", trimmed);
-            writer.write_all(response.as_bytes()).await?;
+            let packet: LogPacket = bincode::deserialize(&payload_buf).unwrap();
+
         }
 
 
