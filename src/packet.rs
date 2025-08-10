@@ -1,15 +1,19 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Note {
-    pub title: String,
-    pub body: String
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LogPacket {
+    pub level: String,
+    pub message: String,
+    pub timestamp: String
 }
 
-impl Note  {
-    pub fn new(title: &str, body: &str) -> Self{
-        Self { title: title.to_string(),
-               body: body.to_string() 
-            }
+impl LogPacket {
+    pub fn new(level: &str, message: &str, timestamp: &str) -> Self{
+        Self 
+        { 
+            level: level.to_string(),
+            message: message.to_string(),
+            timestamp: timestamp.to_string()
+        }
     }
 }
