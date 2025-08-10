@@ -41,18 +41,19 @@ async fn main() -> std::io::Result<()> {
 
         let(reader, mut writer) = socket.split();
         let mut buf_reader = BufReader::new(reader);
-        let mut line = String::new();
 
         loop {
-            line.clear();
             let mut len_bufer = [0u8; 4];
-            buf_reader.read_exact(&mut len_bufer).await?;
+            if buf_reader.read_exact(&mut len_bufer).await.is_err(){
+                break;
+            }
             let len = u32::from_be_bytes(len_bufer);
 
             let mut payload_bufer = vec![0u8; len as usize];
             buf_reader.read_exact(&mut payload_bufer).await?;
 
             let packet:LogPacket = bincode::deserialize(&payload_bufer).unwrap();
+            println!("Recived Packet: {:?}", packet);
 
         }
 
