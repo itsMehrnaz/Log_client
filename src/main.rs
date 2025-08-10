@@ -46,11 +46,11 @@ async fn main() -> std::io::Result<()> {
         loop {
             line.clear();
             let mut len_bufer = [0u8; 4];
-            socket.read_exact(&mut len_bufer).await?;
+            buf_reader.read_exact(&mut len_bufer).await?;
             let len = u32::from_be_bytes(len_bufer);
 
             let mut payload_bufer = vec![0u8; len as usize];
-            socket.read_exact(&mut payload_bufer).await?;
+            buf_reader.read_exact(&mut payload_bufer).await?;
 
             let packet:LogPacket = bincode::deserialize(&payload_bufer).unwrap();
 
