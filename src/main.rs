@@ -1,4 +1,6 @@
 use chrono::{DateTime, Utc};
+use tokio::{fs::File, io::{AsyncBufReadExt, BufReader}};
+
 
 #[derive(Debug)]
 struct SyslogMessage {
@@ -32,4 +34,23 @@ fn parse_syslog_line(line: &str) -> Option<SyslogMessage> {
     } else {
         None
     }
+}
+
+
+
+#[tokio::main]
+async fn main() -> tokio::io::Result<()> {
+    let file = File::open("/tmp/test.log").await?;
+    let reader = BufReader::new(file);
+    let mut lines = reader.lines();
+
+    while let Some(line) = lines.next_line().await? {
+        if let Some(msg) = parse_syslog_line(&line) {
+            println!("{:?}", msg);
+        } else {
+            println!("خط نامعتبر: {}", line);
+        }
+    }
+
+    Ok(())
 }
