@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use tokio::{fs::File, io::{AsyncBufReadExt, BufReader}};
 
-
 #[derive(Debug)]
 struct SyslogMessage {
     facility: u8,
@@ -35,8 +34,6 @@ fn parse_syslog_line(line: &str) -> Option<SyslogMessage> {
         None
     }
 }
-
-
 
 #[tokio::main]
 async fn main() -> tokio::io::Result<()> {
