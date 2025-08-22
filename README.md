@@ -21,13 +21,13 @@
     - **File I/O:** Reading and writing files, appending logs, and maintaining history in `Vec<Log>`.
     - I will add projects when I write them...
         
-- ** Usage Notes:**
+- **Usage Notes:**
     
     - Exercises are independent and can be executed separately.
         
     - Some examples include TCP/UDP networking, async/await, and Rust modularization.
         
-- ** Highlights:**
+- **Highlights:**
     
     - Focus on **modular programming** using `serde`, `bincode`, and `tokio`.
         
